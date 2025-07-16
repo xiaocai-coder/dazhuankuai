@@ -21,24 +21,26 @@ GameWidget::GameWidget(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &GameWidget::updateGame);
     timer->start(16);
 
-//    restartButton = new QPushButton("重新开始", this);
-//    restartButton->setGeometry(width() - 110, height() - 40, 100, 30);
-//    connect(restartButton, &QPushButton::clicked, this, [=]() {
-//        score = 0;
-//        lives = 3;
-//        resetBricks();
+    restartButton = new QPushButton("重新开始", this);
+    restartButton->setGeometry(width() - 110, height() - 40, 100, 30);
+    connect(restartButton, &QPushButton::clicked, this, [=]() {
+        score = 0;
+        lives = 3;
+        resetBricks();
 
 
-//        paddle->resetPosition(width() / 2 - 40, height() - 30);
-//        ball->resetPosition(width() / 2, height() / 2);
+        paddle->resetPosition(width() / 2 - 40, height() - 30);
+        ball->resetPosition(width() / 2, height() / 2);
 
-//        //  状态清空
-//        leftPressed = false;
-//        rightPressed = false;
+        //  状态清空
+        leftPressed = false;
+        rightPressed = false;
 
-//        timer->start();
-//        update();
-//    });
+        timer->start();
+        update();
+    });
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void GameWidget::resetBricks()
@@ -46,9 +48,17 @@ void GameWidget::resetBricks()
     bricks.clear();
     int rows = 5, cols = 10;
     int brickWidth = 50, brickHeight = 20;
-    for (int i = 0; i < rows; ++i)
-        for (int j = 0; j < cols; ++j)
-            bricks.append(new Brick(j * (brickWidth + 5) + 20, i * (brickHeight + 5) + 20));
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            int hits = 1;
+            if (i < 1) hits = 3;     // 最上面一行是强化砖（3命）
+            else if (i < 3) hits = 2; // 中间2行中砖（2命）
+            bricks.append(new Brick(j * (brickWidth + 5) + 20,
+                                     i * (brickHeight + 5) + 20,
+                                     hits));
+        }
+    }
 }
 
 void GameWidget::paintEvent(QPaintEvent *)
@@ -64,7 +74,17 @@ void GameWidget::paintEvent(QPaintEvent *)
         p.setFont(scoreFont);
         p.setPen(Qt::black);
         p.drawText(10, 20, QString("Score: %1").arg(score));
+    //绘制生命
         p.drawText(10, 40, QString("Lives: %1").arg(lives));
+
+        //绘制暂停
+        if (isPaused) {
+                QFont pauseFont("Arial", 20, QFont::Bold);
+                p.setFont(pauseFont);
+                p.setPen(Qt::red);
+                p.drawText(rect(), Qt::AlignCenter, "游戏暂停\n按空格继续");
+            }
+
 }
 
 void GameWidget::keyPressEvent(QKeyEvent *event)
@@ -73,6 +93,16 @@ void GameWidget::keyPressEvent(QKeyEvent *event)
         leftPressed = true;
     else if (event->key() == Qt::Key_Right)
         rightPressed = true;
+
+    else if (event->key() == Qt::Key_Space)
+        {
+            isPaused = !isPaused;
+            if (isPaused)
+                timer->stop(); // 暂停
+            else
+                timer->start(16); // 恢复
+            update(); // 立即刷新屏幕，显示或清除“暂停”提示
+        }
 }
 
 void GameWidget::keyReleaseEvent(QKeyEvent *event)
@@ -100,10 +130,11 @@ void GameWidget::updateGame()
     // 4. 检测小球是否与砖块碰撞
     for (auto brick : bricks) {
         if (!brick->isDestroyed() && ball->collidesWith(brick)) {
-            brick->destroy();      // 销毁砖块
-            ball->bounceY();       // 反弹球
-            score += 10;           // 加分
-            break;                 // 防止多个砖块同时被击中
+            brick->hit();          // 先减命
+            ball->bounceY();
+            if (brick->isDestroyed())
+                score += 10;       // 只在砖块消失时加分
+            break;
         }
     }
 

@@ -1,27 +1,39 @@
 #include "brick.h"
 
-Brick::Brick(int x, int y)
+Brick::Brick(int x, int y, int hits)
+    : hitsRemaining(hits)
 {
     brickRect = QRect(x, y, 50, 20);
 }
 
-void Brick::draw(QPainter *p)
-{
-    p->setBrush(Qt::green);
-    p->drawRect(brickRect);
-}
-
-QRect Brick::rect() const
-{
+QRect Brick::rect() const {
     return brickRect;
 }
 
-bool Brick::isDestroyed() const
-{
-    return destroyed;
+bool Brick::isDestroyed() const {
+    return hitsRemaining <= 0;
 }
 
-void Brick::destroy()
+void Brick::hit() {
+    hitsRemaining--;
+}
+
+int Brick::getHitsRemaining() const {
+    return hitsRemaining;
+}
+
+void Brick::draw(QPainter *p) const
 {
-    destroyed = true;
+    if (isDestroyed()) return;
+
+    QColor color;
+    switch (hitsRemaining) {
+    case 3: color = Qt::darkRed; break;
+    case 2: color = Qt::blue; break;
+    case 1: color = Qt::green; break;
+    default: color = Qt::gray; break;
+    }
+
+    p->setBrush(color);
+    p->drawRect(brickRect);
 }

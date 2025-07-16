@@ -37,6 +37,8 @@ private:
     int lives = 3;              // 初始生命值
     void resetBallAndPaddle(); // 重置球和挡板
     QPushButton *restartButton;//重新开始按钮
+
+    bool isPaused = false;//判断是否暂停
 };
 
 #endif // GAMEWIDGET_H
