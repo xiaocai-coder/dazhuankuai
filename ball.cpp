@@ -18,10 +18,10 @@ void Ball::move()
     if (ballRect.top() <= 0) bounceY();
 }
 
-void Ball::bounceX() { dx = -dx; }
+void Ball::bounceX() { dx = -dx; }//碰撞
 void Ball::bounceY() { dy = -dy; }
 
-bool Ball::collidesWith(Paddle *p)
+bool Ball::collidesWith(Paddle *p)//碰撞检测
 {
     return ballRect.intersects(p->rect());
 }
@@ -30,7 +30,7 @@ bool Ball::collidesWith(Brick *b)
 {
     return ballRect.intersects(b->rect());
 }
-QRect Ball::rect() const
+QRect Ball::rect() const//区域
 {
     return ballRect;
 }

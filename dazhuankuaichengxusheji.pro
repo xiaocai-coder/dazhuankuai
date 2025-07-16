@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Item.cpp \
     ball.cpp \
     brick.cpp \
     main.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
     widget.cpp
 
 HEADERS += \
+    Item.h \
     ball.h \
     brick.h \
     paddle.h \

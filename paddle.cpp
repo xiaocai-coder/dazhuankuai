@@ -11,13 +11,13 @@ void Paddle::draw(QPainter *p)
     p->drawRect(paddleRect);
 }
 
-void Paddle::moveLeft()
+void Paddle::moveLeft()//左移
 {
     if (paddleRect.left() > 0)
         paddleRect.translate(-speed, 0);
 }
 
-void Paddle::moveRight()
+void Paddle::moveRight()//右移
 {
     if (paddleRect.right() < 600)
         paddleRect.translate(speed, 0);

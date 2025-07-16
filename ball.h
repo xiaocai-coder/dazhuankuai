@@ -10,11 +10,11 @@ class Ball
 {
 public:
     Ball(int x, int y);
-    void move();
+    void move();//移动
     void draw(QPainter *p);
-    void bounceX();
+    void bounceX();//反弹
     void bounceY();
-    bool collidesWith(Paddle *p);
+    bool collidesWith(Paddle *p);//碰撞检测
     bool collidesWith(Brick *b);
     QRect rect() const;      // 获取球的矩形区域
     int centerX() const;     // （可选）用于反弹角度判断
