@@ -8,6 +8,8 @@
 #include "brick.h"
 #include <QVector>
 #include <QPushButton>
+#include <QMediaPlayer>
+
 
 class GameWidget : public QWidget
 {
@@ -24,6 +26,7 @@ private slots:
 
     void updateGame();
 
+
 private:
     QTimer *timer;
     Paddle *paddle;
@@ -39,6 +42,9 @@ private:
     QPushButton *restartButton;//重新开始按钮
 
     bool isPaused = false;//判断是否暂停
+
+    QMediaPlayer *player;
+
 };
 
 #endif // GAMEWIDGET_H
