@@ -13,7 +13,13 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="tubiaoyingyue.qrc">
+    <normaloff>:/prefix1/inmage/tubiao.png</normaloff>:/prefix1/inmage/tubiao.png</iconset>
+  </property>
  </widget>
- <resources/>
+ <resources>
+  <include location="tubiaoyingyue.qrc"/>
+ </resources>
  <connections/>
 </ui>

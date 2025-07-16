@@ -6,7 +6,7 @@ Brick::Brick(int x, int y, int hits)
     brickRect = QRect(x, y, 50, 20);
 }
 
-QRect Brick::rect() const {//区域
+QRect Brick::rect() const {
     return brickRect;
 }
 
@@ -14,7 +14,7 @@ bool Brick::isDestroyed() const {
     return hitsRemaining <= 0;
 }
 
-void Brick::hit() {//撞击
+void Brick::hit() {
     hitsRemaining--;
 }
 

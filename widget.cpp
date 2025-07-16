@@ -17,9 +17,13 @@ GameWidget::GameWidget(QWidget *parent)
     scoreFont.setBold(true);
 
 
-    timer = new QTimer(this);//启动定时器
+//    timer = new QTimer(this);//启动定时器
+//    connect(timer, &QTimer::timeout, this, &GameWidget::updateGame);
+//    timer->start(16);
+
+    timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &GameWidget::updateGame);
-    timer->start(16);
+
 
     restartButton = new QPushButton("重新开始", this);
     restartButton->setGeometry(width() - 110, height() - 40, 100, 30);
@@ -36,11 +40,16 @@ GameWidget::GameWidget(QWidget *parent)
         leftPressed = false;
         rightPressed = false;
 
-        timer->start();
+        timer->start(16);
         update();
     });
 
     setFocusPolicy(Qt::StrongFocus);
+
+    player = new QMediaPlayer(this);
+    player->setMedia(QUrl::fromLocalFile(":/prefix1/inmage/yinxiao.mp3"));
+    player->setVolume(50);
+
 }
 
 void GameWidget::resetBricks()
@@ -113,6 +122,22 @@ void GameWidget::keyReleaseEvent(QKeyEvent *event)
         rightPressed = false;
 }
 
+void GameWidget::startGame()
+{
+    score = 0;
+    lives = 3;
+    resetBricks();
+    paddle->resetPosition(width() / 2 - 40, height() - 30);
+    ball->resetPosition(width() / 2, height() / 2);
+    leftPressed = false;
+    rightPressed = false;
+
+    timer->start(16);
+    update();
+}
+
+
+
 void GameWidget::updateGame()
 {
     // 1. 移动挡板（根据按键状态）
@@ -133,7 +158,8 @@ void GameWidget::updateGame()
             brick->hit();          // 先减命
             ball->bounceY();
             if (brick->isDestroyed())
-                score += 10;       // 只在砖块消失时加分
+                score += 10;// 只在砖块消失时加分
+            player->play();;
             break;
         }
     }
@@ -166,6 +192,7 @@ void GameWidget::updateGame()
 
     // 7. 重新绘制界面
     update();
+
 }
 
 void GameWidget::resetBallAndPaddle()
@@ -173,3 +200,4 @@ void GameWidget::resetBallAndPaddle()
     paddle->resetPosition(width() / 2 - 40, height() - 30);
     ball->resetPosition(width() / 2, height() / 2);
 }
+
