@@ -61,8 +61,29 @@ void GameWidget::resetBricks()
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             int hits = 1;
-            if (i < 1) hits = 3;     // 最上面一行是强化砖（3命）
-            else if (i < 3) hits = 2; // 中间2行中砖（2命）
+
+            // 根据当前关卡设置砖块耐久度分布
+            if (currentLevel == 1) {
+                // 第1关：上强化砖
+                if (i < 1) hits = 3;
+                else if (i < 3) hits = 2;
+            }
+            else if (currentLevel == 2) {
+                // 第2关：交错强化砖
+                hits = ((i + j) % 3) + 1; // 1~3之间变化
+            }
+            else if (currentLevel == 3) {
+                // 第3关：下方更硬
+                if (i >= 4) hits = 3;
+                else if (i >= 2) hits = 2;
+                else hits = 1;
+            }
+            else {
+                // 默认（或未定义关卡）使用第1关的布局
+                if (i < 1) hits = 3;
+                else if (i < 3) hits = 2;
+            }
+
             bricks.append(new Brick(j * (brickWidth + 5) + 20,
                                      i * (brickHeight + 5) + 20,
                                      hits));
@@ -79,13 +100,16 @@ void GameWidget::paintEvent(QPaintEvent *)
         if (!brick->isDestroyed())
             brick->draw(&p);
 
-    // 绘制得分
-        p.setFont(scoreFont);
-        p.setPen(Qt::black);
-        p.drawText(10, 20, QString("Score: %1").arg(score));
-    //绘制生命
-        p.drawText(10, 40, QString("Lives: %1").arg(lives));
+    // 3. 绘制游戏状态信息（关卡，得分，生命）
+    p.setPen(Qt::black);
+    p.setFont(scoreFont);  // 你之前定义的字体对象
 
+    // 左上角显示得分、生命和关卡
+    QString info = QString("关卡: %1    得分: %2    生命: %3")
+                        .arg(currentLevel)
+                        .arg(score)
+                        .arg(lives);
+    p.drawText(10, 20, info);
         //绘制暂停
         if (isPaused) {
                 QFont pauseFont("Arial", 20, QFont::Bold);
@@ -175,23 +199,32 @@ void GameWidget::updateGame()
             resetBallAndPaddle();
         }
     }
-    // 6. 检查是否通关（所有砖块被消灭）
-    bool win = true;
-    for (auto brick : bricks) {
-        if (!brick->isDestroyed()) {
-            win = false;
-            break;
+
+    // 6. 检查通关条件（所有砖块被打掉）
+        bool allDestroyed = true;
+        for (auto brick : bricks) {
+            if (!brick->isDestroyed()) {
+                allDestroyed = false;
+                break;
+            }
         }
-    }
 
-    if (win) {
-        timer->stop();
-        QMessageBox::information(this, "Congratulations", "你赢了！");
-        return;
-    }
+        if (allDestroyed) {
+            timer->stop();
+            if (currentLevel < maxLevel) {
+                currentLevel++;
+                QMessageBox::information(this, "通关", QString("进入第 %1 关").arg(currentLevel));
+                resetBricks();
+                resetBallAndPaddle();
+                timer->start(16);  // 重新开始
+            } else {
+                QMessageBox::information(this, "胜利", "恭喜你通关所有关卡！");
+            }
+            return;
+        }
 
-    // 7. 重新绘制界面
-    update();
+        // 7. 重绘
+        update();
 
 }
 

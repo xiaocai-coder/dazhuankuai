@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     ball.cpp \
     brick.cpp \
+    item.cpp \
     main.cpp \
     menuwidget.cpp \
     paddle.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 HEADERS += \
     ball.h \
     brick.h \
+    item.h \
     menuwidget.h \
     paddle.h \
     widget.h
