@@ -46,29 +46,39 @@ void HighScoreWidget::loadScores()
     int count = settings.beginReadArray("HighScores");
     for (int i = 0; i < count; ++i) {
         settings.setArrayIndex(i);
-        int s = settings.value("score", 0).toInt();
-        if (s >= 0) scores.append(s); // 排除负数或非法分数
+        QString name = settings.value("name", "未知玩家").toString();
+        int score = settings.value("score", 0).toInt();
+        if (score >= 0) {
+            scores.append(qMakePair(name, score));
+        }
     }
     settings.endArray();
 
-    std::sort(scores.begin(), scores.end(), std::greater<int>()); // 降序排序
+    // 按照分数降序排序
+    std::sort(scores.begin(), scores.end(), [](const QPair<QString, int> &a, const QPair<QString, int> &b) {
+        return a.second > b.second;
+    });
 
+    // 显示前10名
     for (int i = 0; i < scores.size() && i < 10; ++i) {
-        scoreList->addItem(QString("%1. %2 分").arg(i + 1).arg(scores[i]));
+        scoreList->addItem(QString("%1. %2 - %3 分").arg(i + 1).arg(scores[i].first).arg(scores[i].second));
     }
 }
 
-void HighScoreWidget::addScore(int score)
+void HighScoreWidget::addScore(const QString &name, int score)
 {
-    if (score < 0) return; // 忽略非法分数
-    scores.append(score);
-    std::sort(scores.begin(), scores.end(), std::greater<int>());
+    if (score < 0 || name.isEmpty()) return;
+
+    scores.append(qMakePair(name, score));
+    std::sort(scores.begin(), scores.end(), [](const QPair<QString, int> &a, const QPair<QString, int> &b) {
+        return a.second > b.second;
+    });
 
     if (scores.size() > 10)
-        scores = scores.mid(0, 10); // 保留前10名
+        scores = scores.mid(0, 10); // 仅保留前10名
 
     saveScores();
-    loadScores();
+    loadScores(); // 重新加载以更新界面
 }
 
 void HighScoreWidget::saveScores()
@@ -77,7 +87,8 @@ void HighScoreWidget::saveScores()
     settings.beginWriteArray("HighScores");
     for (int i = 0; i < scores.size(); ++i) {
         settings.setArrayIndex(i);
-        settings.setValue("score", scores[i]);
+        settings.setValue("name", scores[i].first);
+        settings.setValue("score", scores[i].second);
     }
     settings.endArray();
 }

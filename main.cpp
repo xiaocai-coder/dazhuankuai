@@ -3,8 +3,8 @@
 #include "highscore.h"
 
 #include <QApplication>
-
-
+#include <QInputDialog>
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +13,11 @@ int main(int argc, char *argv[])
     MenuWidget menu;
     GameWidget game;
     HighScoreWidget highScore;
+
+    menu.setWindowTitle("🧱 超级打砖块：砖力无限 - 主菜单");
+    game.setWindowTitle("🧱 超级打砖块：砖力无限 - 游戏中");
+    highScore.setWindowTitle("🧱 超级打砖块：砖力无限 - 高分榜");
+
 
 
     game.hide();
@@ -37,10 +42,20 @@ int main(int argc, char *argv[])
             });
 
             QObject::connect(&game, &GameWidget::gameOver, [&](int finalScore) {
-                game.hide();
-                highScore.addScore(finalScore);
-                highScore.loadScores();
-                highScore.show();
+                    game.hide();
+
+                    QString playerName = QInputDialog::getText(nullptr, "游戏结束",
+                                            QString("你的得分是 %1\n请输入你的名字：").arg(finalScore),
+                                            QLineEdit::Normal, "玩家");
+
+
+                    if (!playerName.isEmpty()) {
+                                highScore.addScore(playerName, finalScore);
+                            }
+
+                            // 自动跳转高分榜
+                            highScore.loadScores();
+                            highScore.show();
             });
 
     menu.show();
