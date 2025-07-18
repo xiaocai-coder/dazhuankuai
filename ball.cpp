@@ -50,3 +50,8 @@ void Ball::resetPosition(int x, int y)
     ballRect.moveTo(x, y);
     dx = 4; dy = -4; // 方向重置（可调）
 }
+void Ball::speedUp() {
+    dx *= 1.2;
+    dy *= 1.2;
+}
+

@@ -2,6 +2,9 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include "Item.h"
+#include <QTime>
+
 GameWidget::GameWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -49,6 +52,8 @@ GameWidget::GameWidget(QWidget *parent)
     player = new QMediaPlayer(this);
     player->setMedia(QUrl::fromLocalFile(":/prefix1/inmage/yinxiao.mp3"));
     player->setVolume(50);
+
+
 
 }
 
@@ -110,6 +115,9 @@ void GameWidget::paintEvent(QPaintEvent *)
                         .arg(score)
                         .arg(lives);
     p.drawText(10, 20, info);
+    for (Item* item : items)
+        item->draw(&p);
+
         //绘制暂停
         if (isPaused) {
                 QFont pauseFont("Arial", 20, QFont::Bold);
@@ -155,6 +163,8 @@ void GameWidget::startGame()
     ball->resetPosition(width() / 2, height() / 2);
     leftPressed = false;
     rightPressed = false;
+    qsrand(QTime::currentTime().msec());
+
 
     timer->start(16);
     update();
@@ -181,14 +191,28 @@ void GameWidget::updateGame()
         if (!brick->isDestroyed() && ball->collidesWith(brick)) {
             brick->hit();          // 先减命
             ball->bounceY();
-            if (brick->isDestroyed())
-                score += 10;// 只在砖块消失时加分
+            if (brick->isDestroyed()) {
+                score += 10;
+                player->play();
+
+                // 随机生成道具（30% 概率）
+                if (qrand() % 100 < 30) {
+                    ItemType type = static_cast<ItemType>(qrand() % 3);
+                    items.append(new Item(brick->rect().center().x(), brick->rect().center().y(), type));
+                }
+            }
+                // 只在砖块消失时加分
             player->play();;
             break;
         }
     }
 
-    // 5. 检测球是否掉到底部（后续可加 Game Over 逻辑）
+    //5.判断球是否与道具碰撞
+
+
+
+
+    // 6. 检测球是否掉到底部（后续可加 Game Over 逻辑）
     if (ball->rect().bottom() >= height()) {
         lives--;
         if (lives <= 0) {
@@ -200,7 +224,7 @@ void GameWidget::updateGame()
         }
     }
 
-    // 6. 检查通关条件（所有砖块被打掉）
+    // 7. 检查通关条件（所有砖块被打掉）
         bool allDestroyed = true;
         for (auto brick : bricks) {
             if (!brick->isDestroyed()) {
@@ -223,7 +247,28 @@ void GameWidget::updateGame()
             return;
         }
 
-        // 7. 重绘
+        for (int i = 0; i < items.size(); ++i) {
+            items[i]->move();
+
+            if (items[i]->isCaughtBy(paddle)) {
+                ItemType t = items[i]->getType();
+                if (t == ExtraLife) lives++;
+                else if (t == EnlargePaddle) paddle->enlarge(); // 需要你在 Paddle 类中添加 enlarge() 函数
+                else if (t == SpeedUpBall) ball->speedUp();     // 同样需实现 speedUp()
+
+                delete items[i];
+                items.remove(i);
+                i--;
+            }
+            // 超出界面也删除
+            else if (items[i]->rect().top() > height()) {
+                delete items[i];
+                items.remove(i);
+                i--;
+            }
+        }
+
+        // 8. 重绘
         update();
 
 }

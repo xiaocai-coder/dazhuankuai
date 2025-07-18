@@ -20,6 +20,7 @@ public:
     int centerX() const;     // （可选）用于反弹角度判断
     int y() const;           // （可选）返回球的 y 坐标
     void resetPosition(int ,int y);
+    void speedUp();
 private:
     QRect ballRect;
     int dx = 4, dy = -4;

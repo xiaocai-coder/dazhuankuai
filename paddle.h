@@ -13,6 +13,7 @@ public:
     void moveRight();
     QRect rect() const;
     void resetPosition(int x,int y);
+    void enlarge();
 
 private:
     QRect paddleRect;

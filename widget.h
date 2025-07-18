@@ -9,7 +9,7 @@
 #include <QVector>
 #include <QPushButton>
 #include <QMediaPlayer>
-
+#include "Item.h"
 
 class GameWidget : public QWidget
 {
@@ -47,6 +47,7 @@ private:
 
     int currentLevel = 1;             // 当前关卡
     const int maxLevel = 3;           // 总关卡数
+     QVector<Item*> items;//道具
 
 
 };

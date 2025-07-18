@@ -32,3 +32,9 @@ void Paddle::resetPosition(int x, int y)
 {
     paddleRect.moveTo(x, y);
 }
+
+
+void Paddle::enlarge() {
+    paddleRect.setWidth(paddleRect.width() + 30);
+}
+
