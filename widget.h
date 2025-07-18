@@ -16,11 +16,23 @@ class GameWidget : public QWidget
     Q_OBJECT
 public:
     GameWidget(QWidget *parent = nullptr);
+    enum GameMode {
+            Endless,  // 无尽模式
+            Level     // 关卡模式
+        };
+
+    void setMode(GameMode mode);   // 设置游戏模式
+    void setLevel(int level);      // 设置关卡
     void startGame();
+
+    void pauseGame();
+    void resumeGame();
+
+
 
 signals:
     void gameOver(int finalScore);
-
+    void gameEndedByUser();
 
 protected:
     void paintEvent(QPaintEvent *) override;
@@ -54,7 +66,13 @@ private:
 
     int currentLevel = 1;             // 当前关卡
     const int maxLevel = 3;           // 总关卡数
-     QVector<Item*> items;//道具
+    QVector<Item*> items;//道具
+
+    GameMode currentMode = Endless;  // 默认是无尽模式
+    void loadLevel(int level);
+
+    QPushButton *endGameButton;//结束游戏
+
 
 
 };

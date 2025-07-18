@@ -15,6 +15,7 @@ MenuWidget::MenuWidget(QWidget *parent)
     title->setFont(titleFont);
     title->setAlignment(Qt::AlignCenter);
 
+
     startButton = new QPushButton("开始游戏", this);
     startButton->setFixedSize(200, 50);
 

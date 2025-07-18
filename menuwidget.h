@@ -3,12 +3,14 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QComboBox>
 
 class MenuWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit MenuWidget(QWidget *parent = nullptr);
+    int selectedLevel() const;
 
 signals:
     void startGameClicked();
@@ -18,6 +20,7 @@ private:
     QPushButton *startButton;
     QPushButton *exitButton;
     QPushButton *highScoreButton;
+    QComboBox *levelSelector;
 };
 
 #endif // MENUWIDGET_H

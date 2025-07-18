@@ -35,7 +35,14 @@ GameWidget::GameWidget(QWidget *parent)
             paddleTimer->stop();
         }
     });
+    endGameButton = new QPushButton("结束游戏", this);
+    endGameButton->setGeometry(width()/2 - 50, height()/2 + 40, 100, 40);
+    endGameButton->hide();
 
+    connect(endGameButton, &QPushButton::clicked, this, [=]() {
+        timer->stop();      // 停止游戏定时器
+        emit gameEndedByUser();  // 自定义信号，通知外部
+    });
 
 
     restartButton = new QPushButton("重新开始", this);
@@ -93,6 +100,19 @@ void GameWidget::resetBricks()
                 else if (i >= 2) hits = 2;
                 else hits = 1;
             }
+            else if (currentLevel == 4) {
+            // 第4关：中心强化砖（玩家更难控制反弹）
+            if (i >= 1 && i <= 3 && j >= 3 && j <= 6)
+                 hits = 3;  // 中间大块强化砖
+             else if (i == 2 || j == 4 || j == 5)
+                 hits = 2;
+              else
+                   hits = 1;
+                }
+              else if (currentLevel == 5) {
+                // 第5关：棋盘格布局（间隔强化砖）
+               hits = ((i + j) % 2 == 0) ? 3 : 1;
+                    }
             else {
                 // 默认（或未定义关卡）使用第1关的布局
                 if (i < 1) hits = 3;
@@ -144,17 +164,15 @@ void GameWidget::keyPressEvent(QKeyEvent *event)
         leftPressed = true;
     else if (event->key() == Qt::Key_Right)
         rightPressed = true;
-
     else if (event->key() == Qt::Key_Space)
-        {
-            isPaused = !isPaused;
-            if (isPaused)
-                timer->stop(); // 暂停
-            else
-                timer->start(16); // 恢复
-            update(); // 立即刷新屏幕，显示或清除“暂停”提示
-        }
+    {
+        if (isPaused)
+            resumeGame();
+        else
+            pauseGame();
+    }
 }
+
 
 void GameWidget::keyReleaseEvent(QKeyEvent *event)
 {
@@ -168,12 +186,27 @@ void GameWidget::startGame()
 {
     score = 0;
     lives = 3;
-    resetBricks();
-    paddle->resetPosition(width() / 2 - 40, height() - 30);
-    ball->resetPosition(width() / 2, height() / 2);
+    isPaused =false;
+
     leftPressed = false;
     rightPressed = false;
+
+    if (endGameButton)
+            endGameButton->hide();
+
+
     qsrand(QTime::currentTime().msec());
+
+    if (currentMode == Endless) {
+        currentLevel = 1;
+        resetBricks();  // 默认模式下加载固定砖块布局
+    } else if (currentMode == Level) {
+        //loadLevel(currentLevel);  // 加载指定关卡砖块布局
+        resetBricks();
+    }
+
+    paddle->resetPosition(width() / 2 - 40, height() - 30);
+    ball->resetPosition(width() / 2, height() / 2);
 
 
     timer->start(16);
@@ -294,9 +327,58 @@ void GameWidget::updateGame()
 
 }
 
-void GameWidget::resetBallAndPaddle()
+void GameWidget::resetBallAndPaddle()//重启
 {
     paddle->resetPosition(width() / 2 - 40, height() - 30);
     ball->resetPosition(width() / 2, height() / 2);
+}
+
+void GameWidget::setMode(GameMode mode) {
+    currentMode = mode;
+    if (mode == Endless) {
+            currentLevel = 1;   // 无尽模式从第一关开始
+    }
+}
+
+void GameWidget::setLevel(int level) {
+    currentLevel = level;
+}
+
+void GameWidget::loadLevel(int level)
+{
+    // 清除旧砖块
+    qDeleteAll(bricks);
+    bricks.clear();
+
+    int rows = 5 + level;  // 不同关卡行数不同
+    int cols = 10;
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            int x = 60 + j * 50;
+            int y = 50 + i * 30;
+            Brick *brick = new Brick(x, y, 40);
+            bricks.append(brick);
+        }
+    }
+}
+
+
+void GameWidget::pauseGame()
+{
+    if (isPaused) return;
+    isPaused = true;
+    timer->stop();
+    endGameButton->show();
+    update();
+}
+
+void GameWidget::resumeGame()
+{
+    if (!isPaused) return;
+    isPaused = false;
+    timer->start(16);
+    endGameButton->hide();
+    update();
 }
 

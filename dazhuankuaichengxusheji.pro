@@ -21,8 +21,10 @@ SOURCES += \
     ball.cpp \
     brick.cpp \
     highscore.cpp \
+    levelselect.cpp \
     main.cpp \
     menuwidget.cpp \
+    modeselect.cpp \
     paddle.cpp \
     widget.cpp
 
@@ -31,7 +33,9 @@ HEADERS += \
     ball.h \
     brick.h \
     highscore.h \
+    levelselect.h \
     menuwidget.h \
+    modeselect.h \
     paddle.h \
     widget.h
 
