@@ -45,6 +45,10 @@ private:
 
     QMediaPlayer *player;
 
+    int currentLevel = 1;             // 当前关卡
+    const int maxLevel = 3;           // 总关卡数
+
+
 };
 
 #endif // GAMEWIDGET_H
