@@ -18,6 +18,9 @@ MenuWidget::MenuWidget(QWidget *parent)
     startButton = new QPushButton("开始游戏", this);
     startButton->setFixedSize(200, 50);
 
+    highScoreButton = new QPushButton("查看高分榜", this);
+    highScoreButton->setFixedSize(200, 50);
+
     exitButton = new QPushButton("退出游戏", this);
     exitButton->setFixedSize(200, 50);
 
@@ -26,12 +29,19 @@ MenuWidget::MenuWidget(QWidget *parent)
     layout->addSpacing(50);
     layout->addWidget(startButton, 0, Qt::AlignCenter);
     layout->addSpacing(20);
+    layout->addWidget(highScoreButton, 0, Qt::AlignCenter);
+    layout->addSpacing(20);
     layout->addWidget(exitButton, 0, Qt::AlignCenter);
     layout->addStretch();
 
     connect(startButton, &QPushButton::clicked, this, [=]() {
         emit startGameClicked();
     });
+
+    connect(highScoreButton, &QPushButton::clicked, this, [=]() {
+        emit showHighScoresClicked();
+    });
+
     connect(exitButton, &QPushButton::clicked, this, [=]() {
         close();
     });

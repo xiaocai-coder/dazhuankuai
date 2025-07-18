@@ -12,10 +12,12 @@ public:
 
 signals:
     void startGameClicked();
+    void showHighScoresClicked();
 
 private:
     QPushButton *startButton;
     QPushButton *exitButton;
+    QPushButton *highScoreButton;
 };
 
 #endif // MENUWIDGET_H

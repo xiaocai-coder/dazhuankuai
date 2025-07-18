@@ -18,6 +18,10 @@ public:
     GameWidget(QWidget *parent = nullptr);
     void startGame();
 
+signals:
+    void gameOver(int finalScore);
+
+
 protected:
     void paintEvent(QPaintEvent *) override;
     void keyPressEvent(QKeyEvent *) override;

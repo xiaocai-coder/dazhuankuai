@@ -228,6 +228,9 @@ void GameWidget::updateGame()
         if (lives <= 0) {
             timer->stop();
             QMessageBox::information(this, "Game Over", "你输了！");
+
+            emit gameOver(score);
+
             return;
         } else {
             resetBallAndPaddle();
@@ -253,6 +256,9 @@ void GameWidget::updateGame()
                 timer->start(16);  // 重新开始
             } else {
                 QMessageBox::information(this, "胜利", "恭喜你通关所有关卡！");
+
+                emit gameOver(score);
+
             }
             return;
         }
