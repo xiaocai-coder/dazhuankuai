@@ -15,6 +15,8 @@ public:
     void resetPosition(int x,int y);
     void enlarge();
 
+    void resetWidth();
+
 private:
     QRect paddleRect;
     int speed = 10;

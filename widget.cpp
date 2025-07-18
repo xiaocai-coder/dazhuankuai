@@ -27,6 +27,16 @@ GameWidget::GameWidget(QWidget *parent)
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &GameWidget::updateGame);
 
+    paddleTimer = new QTimer(this);
+    connect(paddleTimer, &QTimer::timeout, this, [=]() {
+        if (isPaddleEnlarged) {
+            paddle->resetWidth(); // 恢复原始宽度
+            isPaddleEnlarged = false;
+            paddleTimer->stop();
+        }
+    });
+
+
 
     restartButton = new QPushButton("重新开始", this);
     restartButton->setGeometry(width() - 110, height() - 40, 100, 30);
@@ -207,7 +217,7 @@ void GameWidget::updateGame()
         }
     }
 
-    //5.判断球是否与道具碰撞
+
 
 
 
@@ -248,25 +258,30 @@ void GameWidget::updateGame()
         }
 
         for (int i = 0; i < items.size(); ++i) {
-            items[i]->move();
-
-            if (items[i]->isCaughtBy(paddle)) {
-                ItemType t = items[i]->getType();
-                if (t == ExtraLife) lives++;
-                else if (t == EnlargePaddle) paddle->enlarge(); // 需要你在 Paddle 类中添加 enlarge() 函数
-                else if (t == SpeedUpBall) ball->speedUp();     // 同样需实现 speedUp()
-
-                delete items[i];
-                items.remove(i);
-                i--;
-            }
-            // 超出界面也删除
-            else if (items[i]->rect().top() > height()) {
-                delete items[i];
-                items.remove(i);
-                i--;
+            Item *item = items[i];
+            item->move();
+            if (item->isCaughtBy(paddle)) {
+                switch (item->getType()) {
+                case EnlargePaddle:
+                    if (!isPaddleEnlarged) {
+                        paddle->enlarge();
+                        isPaddleEnlarged = true;
+                        paddleTimer->start(5000);  // 5秒后恢复
+                    }
+                    break;
+                case ExtraLife:
+                    lives++;
+                    break;
+                case SpeedUpBall:
+                    ball->speedUp();
+                    break;
+                }
+                delete item;
+                items.removeAt(i);
+                --i;
             }
         }
+
 
         // 8. 重绘
         update();

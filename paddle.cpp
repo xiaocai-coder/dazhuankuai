@@ -38,3 +38,11 @@ void Paddle::enlarge() {
     paddleRect.setWidth(paddleRect.width() + 30);
 }
 
+void Paddle::resetWidth() {
+    paddleRect.setWidth(80);  // 假设原始宽度是 80
+}
+
+
+
+
+

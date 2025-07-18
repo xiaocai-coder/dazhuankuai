@@ -29,6 +29,9 @@ private slots:
 
 private:
     QTimer *timer;
+    QTimer *paddleTimer;       // 用于定时恢复挡板长度
+    bool isPaddleEnlarged = false;  // 当前是否处于变长状态
+
     Paddle *paddle;
     Ball *ball;
     QVector<Brick*> bricks;
